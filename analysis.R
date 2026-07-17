@@ -1,4 +1,8 @@
 library(car)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 
 files <- list.files(
   path = "C:/users/hoshi/run/rundata",
@@ -73,8 +77,6 @@ legend(
 )
 dev.off()
 
-library(dplyr)
-
 run$period <- case_when(
   run$month %in% c("25DEC", "26JAN", "26FEB") ~ "25Winter",
   run$month %in% c("26MAR", "26APR", "26MAY") ~ "26Spring",
@@ -136,3 +138,64 @@ legend(
   pch=19
 )
 dev.off()
+
+run$period <- factor(run$period)
+
+bpm_range <- run |>
+  filter(!is.na(bpm), !is.na(period)) |>
+  group_by(period) |>
+  summarise(
+    bpm_min = min(bpm),
+    bpm_max = max(bpm),
+    .groups = "drop"
+  )
+
+newdata <- bpm_range |>
+  mutate(
+    bpm = map2(
+      bpm_min,
+      bpm_max,
+      ~ seq(.x, .y, length.out = 200)
+    )
+  ) |>
+  unnest(bpm) |>
+  select(period, bpm)
+
+pred <- predict(
+  model_2,
+  newdata = newdata,
+  interval = "confidence"
+)
+
+newdata <- newdata |>
+  mutate(
+    fit = pred[, "fit"],
+    lwr = pred[, "lwr"],
+    upr = pred[, "upr"]
+  )
+
+ggplot() +
+  geom_point(
+    data = run,
+    aes(bpm, kmh, color = period),
+    alpha = 0.25,
+    size = 1.2
+  ) +
+  geom_ribbon(
+    data = newdata,
+    aes(bpm, ymin = lwr, ymax = upr, fill = period),
+    alpha = 0.15,
+    color = NA
+  ) +
+  geom_line(
+    data = newdata,
+    aes(bpm, fit, color = period),
+    linewidth = 1.2
+  ) +
+  labs(
+    x = "Heart rate (bpm)",
+    y = "Speed (km/h)",
+    color = "Period",
+    fill = "Period"
+  ) +
+  theme_classic()
