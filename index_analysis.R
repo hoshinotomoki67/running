@@ -52,8 +52,8 @@ make_high_n <- function(data, n){
 }
 
 #choose date in separate
-n_dist_values <- 1:60
-n_high_values <- 1:60
+n_dist_values <- 1:80
+n_high_values <- 1:80
 
 r2_matrix <- matrix(NA, nrow = length(n_dist_values), ncol = length(n_high_values),
                     dimnames = list(dist_days = n_dist_values, high_days = n_high_values))
@@ -101,12 +101,12 @@ for (d in seq_along(n_dist_values)) {
 min_coord <- which(AIC_matrix == min(AIC_matrix), arr.ind = TRUE)
 print(min_coord)
 
-data$dist46  <- make_dist_n(data, 46)
-data$high38  <- make_high_n(data, 38)
+data$dist_best  <- make_dist_n(data, 62)
+data$high_best  <- make_high_n(data, 79)
 
 model <- lm(index ~ dist + ave1k_speed_sec + 
               speed_gap + ave_bpm + gap + 
-              hill + type + dist46 + high38, data = data)
+              hill + type + dist_best + high_best, data = data)
 summary(model)
 vif(model)
 null_model <- lm(index ~ 1, data = data)
@@ -126,7 +126,7 @@ both_model <- step(
   direction = "both"
 )
 
-choose_model_best <- lm(index ~ dist + ave1k_speed_sec + ave_bpm + dist46 + high38 + gap, data = data)
+choose_model_best <- lm(index ~ dist + ave1k_speed_sec + ave_bpm + dist_best + high_best + gap, data = data)
 summary(choose_model_best)
 vif(choose_model_best)
 summary(lm.beta(choose_model_best))
