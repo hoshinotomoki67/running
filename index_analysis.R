@@ -1,6 +1,7 @@
 library(car)
 library(lm.beta)
 data <- read.csv("c:/users/tomokihoshino0607/Documents/index_analysis.csv")
+data <- read.csv("c:/users/hoshi/run/index_analysis.csv")
 
 data$gap <- data$max_bpm - data$ave_bpm
 
