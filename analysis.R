@@ -23,6 +23,8 @@ run <- do.call(rbind, data_list)
 run$kmh <- 3600/run$time_second
 run <- subset(run, km>=2)
 
+run$bpm_c <- run$bpm - mean(run$bpm)
+
 run$month <- factor(
   run$month,
   levels = c("26JUN", "25DEC", "26JAN", "26FEB", "26MAR", "26APR", "26MAY")
@@ -90,10 +92,10 @@ run$period <- factor(
 )
 
 model_2 <- lm(
-  kmh ~ bpm + I(bpm^2) +
+  kmh ~ bpm_c + I(bpm_c^2) +
     period +
-    bpm:period +
-    I(bpm^2):period,
+    bpm_c:period +
+    I(bpm_c^2):period,
   data = run
 )
 car::Anova(model_2, type = 3)
