@@ -1,0 +1,22 @@
+library(car)
+
+data <- read.csv("c:/users/hoshi/run/running_temp.csv")
+data$kmh <- 3600/data$time_second
+data <- subset(data, km>=2)
+data$eff <- 1000*log(data$kmh)/data$bpm
+cor(data$eff, data$kmh)
+cor(data$eff, data$bpm)
+cor(data$eff, data$temp)
+cor(data$eff, data$index)
+plot(data$eff, data$kmh)
+plot(data$eff, data$bpm)
+plot(data$eff, data$temp)
+plot(data$eff, data$index)
+summary(lm(eff~temp, data=data))
+summary(lm(index~temp, data=data))
+model <- lm(kmh ~ bpm + I(bpm^2) + temp, data=data)
+summary(model)
+vif(model)
+model_1 <- lm(kmh ~ bpm + temp, data=data)
+anova(model, model_1)
+car::Anova(model_quad, type = 3)
