@@ -53,8 +53,8 @@ make_high_n <- function(data, n){
 }
 
 #choose date in separate
-n_dist_values <- 1:80
-n_high_values <- 1:80
+n_dist_values <- 30:60
+n_high_values <- 7:21
 
 r2_matrix <- matrix(NA, nrow = length(n_dist_values), ncol = length(n_high_values),
                     dimnames = list(dist_days = n_dist_values, high_days = n_high_values))
