@@ -178,7 +178,7 @@ ggplot() +
   geom_point(
     data = run,
     aes(bpm, kmh, color = period),
-    alpha = 0.25,
+    alpha = 0.6,
     size = 1.2
   ) +
   geom_ribbon(
@@ -198,4 +198,5 @@ ggplot() +
     color = "Period",
     fill = "Period"
   ) +
+  #geom_vline(xintercept = c(160,180))+
   theme_classic()
