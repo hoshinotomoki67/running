@@ -102,7 +102,7 @@ for (d in seq_along(n_dist_values)) {
 min_coord <- which(AIC_matrix == min(AIC_matrix), arr.ind = TRUE)
 print(min_coord)
 
-data$dist_best  <- make_dist_n(data, 46)
+data$dist_best  <- make_dist_n(data, 43)
 data$high_best  <- make_high_n(data, 17)
 
 model <- lm(index ~ dist + ave1k_speed_sec + 
