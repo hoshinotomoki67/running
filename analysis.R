@@ -27,26 +27,26 @@ run$bpm_c <- run$bpm - mean(run$bpm)
 
 run$month <- factor(
   run$month,
-  levels = c("26JUN", "25DEC", "26JAN", "26FEB", "26MAR", "26APR", "26MAY")
+  levels = c("26JUL", "25DEC", "26JAN", "26FEB", "26MAR", "26APR", "26MAY","26JUN")
 )
 
-model <- lm(kmh ~ bpm + I(bpm^2) + month + bpm:month + I(bpm^2):month, data=run)
+model <- lm(time_second ~ bpm + I(bpm^2) + month + bpm:month + I(bpm^2):month, data=run)
 summary(model)
 car::Anova(model, type = 3)
 
 bpm_list <- c(150, 160, 170, 180)
 
 result <- sapply(bpm_list, function(b) {
-  3600 / predict(
+  predict(
     model,
     data.frame(
       bpm = b,
-      month = c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN")
+      month = c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN","26JUL")
     )
   )
 })
 
-rownames(result) <- c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN")
+rownames(result) <- c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN","26JUL")
 colnames(result) <- paste0("bpm", bpm_list)
 
 result
@@ -58,8 +58,8 @@ cols <- c(
   "26MAR" = "#B2DF8A",  
   "26APR" = "#FFD92F",  
   "26MAY" = "#FF7F00",  
-  "26JUN" = "#E31A1C"  
-  #"26JUL" = "#6A3D9A"
+  "26JUN" = "#E31A1C", 
+  "26JUL" = "#6A3D9A"
 )
 
 run$month <- factor(run$month, levels = names(cols))
@@ -82,38 +82,36 @@ dev.off()
 run$period <- case_when(
   run$month %in% c("25DEC", "26JAN", "26FEB") ~ "25Winter",
   run$month %in% c("26MAR", "26APR", "26MAY") ~ "26Spring",
-  # run$month %in% c("26JUN","26JUL", "26AUG") ~ "26Summer",
-  TRUE ~ as.character(run$month)
+  run$month %in% c("26JUN","26JUL") ~ "26Summer",
+  TRUE ~ NA_character_
 )
 
 run$period <- factor(
   run$period,
-  levels = c("26JUN", "25Winter", "26Spring")
+  levels = c("26Summer", "25Winter", "26Spring")
 )
 
 model_2 <- lm(
-  kmh ~ bpm_c + I(bpm_c^2) +
+  time_second ~ bpm + I(bpm^2) +
     period +
-    bpm_c:period +
-    I(bpm_c^2):period,
+    bpm:period +
+    I(bpm^2):period,
   data = run
 )
-car::Anova(model_2, type = 3)
-vif(model_2)
-
 summary(model_2)
+car::Anova(model_2, type = 3)
 
 result_2 <- sapply(bpm_list, function(b) {
-  3600 / predict(
+  predict(
     model_2,
     data.frame(
       bpm = b,
-      period = c("25Winter", "26Spring", "26JUN")
+      period = c("25Winter", "26Spring", "26Summer")
     )
   )
 })
 
-rownames(result_2) <- c("25Winter", "26Spring", "26JUN")
+rownames(result_2) <- c("25Winter", "26Spring", "26Summer")
 colnames(result_2) <- paste0("bpm", bpm_list)
 
 result_2
@@ -121,7 +119,7 @@ result_2
 cols_seasons <- c(
   "Winter" = "#1F78B4",  
   "Spring" = "#33A02C",
-  "26JUN" = "#E66101"
+  "Summer" = "#E66101"
   #"#7F3B08"
 )
 
@@ -179,7 +177,7 @@ newdata <- newdata |>
 ggplot() +
   geom_point(
     data = run,
-    aes(bpm, kmh, color = period),
+    aes(bpm, time_second, color = period),
     alpha = 0.6,
     size = 1.2
   ) +
@@ -196,9 +194,15 @@ ggplot() +
   ) +
   labs(
     x = "Heart rate (bpm)",
-    y = "Speed (km/h)",
+    y = "time_second(s)",
     color = "Period",
     fill = "Period"
   ) +
   #geom_vline(xintercept = c(160,180))+
   theme_classic()
+
+run_temp <- na.omit(run)
+model_temp <- lm(time_second ~ 
+                   bpm_c + I(bpm_c^2) + temp, data = run_temp)
+summary(model_temp)
+car::Anova(model_temp, type = 3)
