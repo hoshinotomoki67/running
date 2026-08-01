@@ -201,8 +201,24 @@ ggplot() +
   #geom_vline(xintercept = c(160,180))+
   theme_classic()
 
+run$kyori <- case_when(
+  run$km %in% c("2", "3", "4", "5") ~ "zenhan",
+  run$km %in% c("6", "7", "8", "9", "10") ~ "kouhan",
+  TRUE ~ "long"
+)
+
+run$kyori <- factor(
+  run$kyori,
+  levels = c("zenhan", "kouhan", "long")
+)
+
+model_3 <- lm(time_second ~ bpm + I(bpm^2) + kyori + bpm:kyori + I(bpm^2):kyori, data=run)
+summary(model_3)
+car::Anova(model_3, type = 3)
+
 run_temp <- na.omit(run)
 model_temp <- lm(time_second ~ 
-                   bpm_c + I(bpm_c^2) + temp, data = run_temp)
+                   bpm + I(bpm^2) + temp + 
+                   kyori + bpm:kyori + I(bpm^2):kyori, data = run_temp)
 summary(model_temp)
 car::Anova(model_temp, type = 3)
