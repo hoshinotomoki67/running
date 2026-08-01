@@ -218,7 +218,6 @@ car::Anova(model_3, type = 3)
 
 run_temp <- na.omit(run)
 model_temp <- lm(time_second ~ 
-                   bpm + I(bpm^2) + temp + 
-                   kyori + bpm:kyori + I(bpm^2):kyori, data = run_temp)
+                   bpm + I(bpm^2) + temp, data = run_temp)
 summary(model_temp)
 car::Anova(model_temp, type = 3)
