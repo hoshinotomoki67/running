@@ -1,0 +1,12 @@
+kine <- read.csv("c:/users/hoshi/polar/kine.csv")
+kine <- subset(kine, km>=2)
+model <- lm(time_second~bpm+temp+up+down, data=kine)
+summary(model)
+model_2 <- lm(time_second~bpm+I(bpm^2)+temp+up+down, data=kine)
+summary(model_2)
+step <- step(model, direction="backward")
+model_better <- lm(time_second~up+down, data=kine)
+summary(model_better)
+kine$alt <- kine$up - kine$down
+plot(kine$alt,kine$time_second)
+abline(lm(time_second ~ alt, data = kine))
