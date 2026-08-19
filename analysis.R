@@ -27,7 +27,7 @@ run$bpm_c <- run$bpm - mean(run$bpm)
 
 run$month <- factor(
   run$month,
-  levels = c("26JUL", "25DEC", "26JAN", "26FEB", "26MAR", "26APR", "26MAY","26JUN")
+  levels = c("26JULAUG", "25DEC", "26JAN", "26FEB", "26MAR", "26APR", "26MAY","26JUN")
 )
 
 model <- lm(time_second ~ bpm + I(bpm^2) + month + bpm:month + I(bpm^2):month, data=run)
@@ -41,12 +41,12 @@ result <- sapply(bpm_list, function(b) {
     model,
     data.frame(
       bpm = b,
-      month = c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN","26JUL")
+      month = c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN","26JULAUG")
     )
   )
 })
 
-rownames(result) <- c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN","26JUL")
+rownames(result) <- c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY","26JUN","26JULAUG")
 colnames(result) <- paste0("bpm", bpm_list)
 
 result
@@ -82,7 +82,7 @@ dev.off()
 run$period <- case_when(
   run$month %in% c("25DEC", "26JAN", "26FEB") ~ "25Winter",
   run$month %in% c("26MAR", "26APR", "26MAY") ~ "26Spring",
-  run$month %in% c("26JUN","26JUL") ~ "26Summer",
+  run$month %in% c("26JUN","26JULAUG") ~ "26Summer",
   TRUE ~ NA_character_
 )
 
