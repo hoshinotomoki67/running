@@ -101,6 +101,8 @@ for (d in seq_along(n_dist_values)) {
 }
 min_coord <- which(AIC_matrix == min(AIC_matrix), arr.ind = TRUE)
 print(min_coord)
+#dist -> +29
+#high -> +6
 
 data$dist_best  <- make_dist_n(data, 46)
 data$high_best  <- make_high_n(data, 19)
