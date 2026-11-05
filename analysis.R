@@ -27,8 +27,8 @@ run$bpm_c <- run$bpm - mean(run$bpm)
 
 run$month <- factor(
   run$month,
-  levels = c("26SEP", "25DEC", "26JAN", "26FEB", "26MAR",
-             "26APR", "26MAY","26JUN","26JUL","26AUG")
+  levels = c("26OCT", "25DEC", "26JAN", "26FEB", "26MAR",
+             "26APR", "26MAY","26JUN","26JUL","26AUG","26SEP")
 )
 
 model <- lm(time_second ~ bpm + I(bpm^2) + month + bpm:month + I(bpm^2):month, data=run)
@@ -43,16 +43,47 @@ result <- sapply(bpm_list, function(b) {
     data.frame(
       bpm = b,
       month = c("25DEC", "26JAN", "26FEB","26MAR","26APR","26MAY",
-                "26JUN","26JUL","26AUG","26SEP")
+                "26JUN","26JUL","26AUG","26SEP","26OCT")
     )
   )
 })
 
 rownames(result) <- c("25DEC", "26JAN", "26FEB","26MAR","26APR",
-                      "26MAY","26JUN","26JUL","26AUG","26SEP")
+                      "26MAY","26JUN","26JUL","26AUG","26SEP","26OCT")
 colnames(result) <- paste0("bpm", bpm_list)
 
 result
+
+par(mar = c(5, 4, 4, 9), xpd = TRUE)
+
+matplot(
+  1:nrow(result), result,
+  type = "l",
+  lty = 1,
+  lwd = 2,
+  col = rainbow(ncol(result)),
+  xaxt = "n",
+  xlab = "Month",
+  ylab = "Predicted pace (sec/km)",
+  ylim = rev(range(result))
+)
+
+axis(
+  1,
+  at = 1:nrow(result),
+  labels = rownames(result)
+)
+
+legend(
+  "topright",
+  inset = c(-0.35, 0),
+  legend = colnames(result),
+  col = rainbow(ncol(result)),
+  lty = 1,
+  lwd = 2,
+  cex = 0.8,
+  bty = "n"
+)
 
 cols <- c(
   "25DEC" = "#1F78B4",  
@@ -86,7 +117,7 @@ run$period <- case_when(
   run$month %in% c("25DEC", "26JAN", "26FEB") ~ "25Winter",
   run$month %in% c("26MAR", "26APR", "26MAY") ~ "26Spring",
   run$month %in% c("26JUN","26JUL","26AUG") ~ "26Summer",
-  run$month %in% c("26SEP") ~ "26AUTUMN",
+  run$month %in% c("26SEP","26OCT") ~ "26AUTUMN",
   TRUE ~ NA_character_
 )
 
@@ -153,3 +184,18 @@ model_temp <- lm(time_second ~
                    bpm + I(bpm^2) + temp, data = run_temp)
 summary(model_temp)
 car::Anova(model_temp, type = 3)
+
+model_temp_2 <- lm(time_second ~ 
+  bpm + I(bpm^2) + temp + month, data = run_temp)
+summary(model_temp_2)
+car::Anova(model_temp_2, type = 3)
+
+model_temp_3 <- lm(time_second ~ 
+                     bpm + I(bpm^2) + temp + month + bpm:month, data = run_temp)
+summary(model_temp_3)
+
+anova(model_temp, model_temp_2, model_temp_3)
+AIC(model_temp, model_temp_2, model_temp_3)
+
+model_temp_4 <- lm(time_second ~ 
+                     bpm + I(bpm^2) + temp * month,data = run_temp)
